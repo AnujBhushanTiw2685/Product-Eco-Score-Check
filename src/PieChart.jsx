@@ -1,24 +1,23 @@
 import React, { useEffect, useRef } from "react";
 import Chart from "chart.js/auto"; // Import Chart.js
 
-// PieChart component
 const PieChart = ({ productData }) => {
   const chartRef = useRef(null); // Reference for the canvas element
+  const chartInstance = useRef(null); // Reference for the Chart.js instance
 
   useEffect(() => {
-    // Get the context of the canvas
     const ctx = chartRef.current.getContext("2d");
 
-    // If there is an existing chart, destroy it before creating a new one
-    if (window.chartInstance) {
-      window.chartInstance.destroy();
+    // Destroy the previous chart instance to prevent duplication
+    if (chartInstance.current) {
+      chartInstance.current.destroy();
     }
 
-    // Create a new chart
-    window.chartInstance = new Chart(ctx, {
-      type: "pie", // Chart type
+    // Create a new Pie chart
+    chartInstance.current = new Chart(ctx, {
+      type: "pie",
       data: {
-        labels: ["Carbon Footprint", "Water Usage", "Energy Efficiency", "Recyclability"],
+        labels: ["Carbon Footprint (kg CO₂)", "Water Usage (liters)", "Energy Efficiency (kWh)", "Recyclability (%)"],
         datasets: [
           {
             label: "Product Lifecycle Insights",
@@ -28,31 +27,52 @@ const PieChart = ({ productData }) => {
               productData.energyEfficiency,
               productData.recyclability,
             ],
-            backgroundColor: ["#ff6f61", "#f9c74f", "#90be6d", "#43aa8b"], // Pie section colors
-            hoverOffset: 4,
+            backgroundColor: ["#FF6F61", "#F9C74F", "#90BE6D", "#43AA8B"],
+            borderColor: ["#FF6F61", "#F9C74F", "#90BE6D", "#43AA8B"],
+            borderWidth: 1,
+            hoverOffset: 10, // Hover effect offset
           },
         ],
       },
       options: {
-        responsive: true, // Make it responsive for different screen sizes
+        responsive: true, // Make it responsive
+        maintainAspectRatio: false, // Allow dynamic sizing
         plugins: {
           legend: {
-            position: "top", // Position the legend at the top
+            position: "top",
+            labels: {
+              color: "#333", // Customize legend text color
+              font: {
+                size: 14, // Adjust font size
+              },
+            },
           },
           tooltip: {
             callbacks: {
-              // Custom tooltip callback to show the value of each section
               label: function (tooltipItem) {
-                return `${tooltipItem.raw} units`; // Showing the unit for each section
+                const label = tooltipItem.label || "";
+                const value = tooltipItem.raw || 0;
+                return `${label}: ${value}`;
               },
             },
           },
         },
       },
     });
+
+    // Cleanup the chart on component unmount
+    return () => {
+      if (chartInstance.current) {
+        chartInstance.current.destroy();
+      }
+    };
   }, [productData]); // Recreate the chart whenever productData changes
 
-  return <canvas ref={chartRef} id="lifecycle-chart" width="400" height="400"></canvas>;
+  return (
+    <div style={{ position: "relative", width: "100%", height: "400px", marginTop: "200px"}}>
+      <canvas ref={chartRef}></canvas>
+    </div>
+  );
 };
 
 export default PieChart;
