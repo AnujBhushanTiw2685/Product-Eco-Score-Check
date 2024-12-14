@@ -1,4 +1,4 @@
-# Full-Stack Application with ReactJS, NodeJS, and MongoDB
+# Full-Stack Application with ReactJS, NodeJS, & MongoDB
 
 This project is a full-stack web application using ReactJS for the frontend, NodeJS for the backend, and MongoDB as the database. This guide provides detailed instructions on how to set up and run the application locally.
 
